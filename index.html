@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vanilla-desktop-os</title>
+    <link rel="stylesheet" href="./style/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div id="desktop" class="w-full h-screen overflow-hidden bg-[url('./assets/desktop.jpg')] bg-cover bg-center relative">
+        <div class="icons w-full h-full relative flex flex-col flex-wrap">
+            <div class="icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300">
+                <img src="./assets/file-explorer.png" alt="File Explorer Icon" class="icon w-12 object-cover ">
+                <span class="icon-label text-sm">File Explorer</span>
+            </div>
+            <div class="icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300">
+                <img src="./assets/notes.png" alt="Notes Icon" class="icon w-12 object-cover ">
+                <span class="icon-label text-sm">Notes</span>
+            </div>
+            <div class="icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300">
+                <img src="./assets/file.png" alt="File Icon" class="icon w-12 object-cover ">
+                <span class="icon-label text-sm">File</span>
+            </div>
+            <div class="icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300">
+                <img src="./assets/recycle.png" alt="Recycle Icon" class="icon w-12 object-cover ">
+                <span class="icon-label text-sm">Recycle</span>
+            </div>
+        </div>
+        <div id="taskbar"
+            class="absolute bottom-0 left-0 w-screen h-12 bg-gray-800 flex items-center justify-between z-100">
+            <div id="weather"></div>
+            <div id="taskbar-icons" class="flex space-x-4"></div>
+            <div id="clock" class="text-white text-lg tracking-wide"></div>
+        </div>
+    </div>
+    <script src="./scripts/main.js"></script>
+</body>
+
+</html>

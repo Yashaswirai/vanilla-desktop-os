@@ -1,0 +1,47 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Satoshi', sans-serif;
+    box-sizing: border-box;
+}
+html , body{
+    height: 100%;
+    width: 100%;
+    color: white;
+}
+#taskbar{
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(17, 25, 40, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    padding: 0 15px;
+}
+#taskbar::selection{
+    background-color: transparent;
+}
+#taskbar button{
+    cursor: pointer;
+}
+.window-header{
+    padding: 0 1%;
+}
+.window-header::selection{
+    background-color: transparent;
+}
+.window-content{
+    padding: 0 1%;
+}
+.icon-container{
+    padding: 5px;
+    margin: 2px 0;
+}
+
+.icon-container span{
+    text-align: center;
+    padding: 0 2px;
+    letter-spacing: 1px;
+    line-height: 0.8;
+}
+.icons{
+    padding: 10px;
+}

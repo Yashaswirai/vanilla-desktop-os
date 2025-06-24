@@ -1,0 +1,36 @@
+[
+    {
+        "name": "File Explorer",
+        "type": "folder",
+        "img":"./assets/file-explorer.png",
+        "contents": [
+            {
+                "name": "Resume.txt",
+                "type": "file",
+                "img": "./assets/notes.png"
+            },
+            {
+                "name": "Project",
+                "type": "folder",
+                "img": "./assets/folder.png",
+                "contents": [
+                    {
+                        "name": "index.html",
+                        "type": "file",
+                        "img": "./assets/html.png"
+                    },
+                    {
+                        "name": "style.css",
+                        "type": "file",
+                        "img": "./assets/css.png"
+                    },
+                    {
+                        "name": "script.js",
+                        "type": "file",
+                        "img": "./assets/js.png"
+                    }
+                ]
+            }
+        ]
+    }
+]
