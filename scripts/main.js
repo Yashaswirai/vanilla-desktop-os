@@ -19,6 +19,7 @@ function clock() {
 clock();
 setInterval(clock, 60000);
 
+const iconContainers = document.querySelectorAll(".icon-container");
 let windowIdCounter = 0;
 let zIndexCounter = 10; // Use a separate counter for z-index
 
@@ -30,57 +31,17 @@ const data = async () => {
       throw new Error("Network response was not ok");
     }
     const jsonData = await response.json();
-    const icons = document.querySelector('.icons');
+    const icons = document.querySelector(".icons");
 
     // Create icons dynamically
     jsonData.forEach((item) => {
-      const iconContainer = createIconContainer(item.AppName, item.img);
+      const iconContainer = createIconContainer(
+        item.name,
+        item.img,
+        item.contents
+      );
       icons.appendChild(iconContainer);
-    });
-
-    // Query the icons after they are appended to the DOM
-    const iconContainers = document.querySelectorAll(".icon-container");
-
-    // Add click event to each icon container to create a window
-    iconContainers.forEach((container) => {
-      const title = container.querySelector(".icon-label").textContent;
-      const img = container.querySelector("img").src;
-
-      container.addEventListener("dblclick", () => {
-        createWindow(title, "This is a new window.", img);
-      });
-    });
-
-    // Add dragging functionality to each icon container
-    iconContainers.forEach((container) => {
-      let isDragging = false;
-      let offsetX, offsetY;
-
-      container.addEventListener("mousedown", (e) => {
-        if (e.button !== 0) return; // Only drag with left mouse button
-
-        isDragging = true;
-        offsetX = e.clientX - container.offsetLeft;
-        offsetY = e.clientY - container.offsetTop;
-
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
-        e.preventDefault();
-      });
-
-      const onMouseMove = (e) => {
-        if (isDragging) {
-          container.style.position = "absolute"; // Ensure the container is positioned absolutely
-          container.style.left = `${e.clientX - offsetX}px`;
-          container.style.top = `${e.clientY - offsetY}px`;
-        }
-      };
-
-      const onMouseUp = () => {
-        isDragging = false;
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-      };
+      initializeIcon(iconContainer, item);
     });
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -88,6 +49,13 @@ const data = async () => {
 };
 
 data();
+
+// Function to initialize each icon with click and drag functionality
+function initializeIcon(container, item) {
+  iconDraggable(container);
+  clickEventIcon(container, item);
+}
+
 function createWindow(title, content, img) {
   const windowId = `window-${windowIdCounter++}`;
 
@@ -236,7 +204,7 @@ function removeTaskbarButton(windowElement) {
 }
 
 // function to create icon containers
-function createIconContainer(title, imgSrc) {
+function createIconContainer(title, imgSrc, contents) {
   const container = document.createElement("div");
   container.className =
     "icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300";
@@ -255,21 +223,18 @@ function createIconContainer(title, imgSrc) {
   return container;
 }
 
-const iconContainers = document.querySelectorAll(".icon-container");
-
 // Add click event to each icon container to create a window
-iconContainers.forEach((container) => {
-  const title = container.querySelector(".icon-label").textContent;
-  const img = container.querySelector("img").src;
-
+const clickEventIcon = (container, item) => {
+  const title = item.name;
+  const img = item.img;
   container.style.width = container.style.height;
   container.addEventListener("dblclick", () => {
-    createWindow(title, "This is a new window.", img);
+    createWindow(title, contentWindow(item), img);
   });
-});
+};
 
 // iconContainer dragging functionality
-iconContainers.forEach((container) => {
+const iconDraggable = (container) => {
   let isDragging = false;
   let offsetX, offsetY;
 
@@ -298,14 +263,62 @@ iconContainers.forEach((container) => {
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup", onMouseUp);
   };
-});
-// How content will be represented in the window
-const content = () => {
-  return `
-    <div class="window-content">
-      <h1 class="window-title">${title}</h1>
-      <p class="window-description">${description}</p>
-      <img src="${img}" alt="${title}" class="window-image">
-    </div>
-  `;
+};
+
+const showContent = (contents) => {
+  return contents
+    .map((content) => {
+      if (content.type === "file") {
+        return `<div class="file-item flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
+                <img src="./assets/file.png" alt="${content.name}" class="w-6 h-6 object-cover">
+                <span>${content.name}</span>
+              </div>`;
+      } else if (content.type === "folder") {
+        return `<div class="folder-item flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer" data-folder-name="${content.name}">
+                <img src="./assets/folder.png" alt="${content.name}" class="w-6 h-6 object-cover">
+                <span>${content.name}</span>
+              </div>`;
+      }
+    })
+    .join(""); // Use join to return a single string
+};
+
+// Function to handle folder navigation
+const navigatingFolder = (windowId, contents) => {
+  const windowElement = document.getElementById(windowId);
+  const folderItems = windowElement.querySelectorAll(".folder-item");
+
+  folderItems.forEach((folderItem) => {
+    folderItem.addEventListener("click", () => {
+      const folderName = folderItem.getAttribute("data-folder-name");
+      const folderContent = contents.find(
+        (content) => content.name === folderName && content.type === "folder"
+      );
+
+      if (folderContent) {
+        const newContent = showContent(folderContent.contents);
+        const windowContentElement = windowElement.querySelector(
+          ".window-content .file-list"
+        );
+        windowContentElement.innerHTML = newContent;
+
+        // Reattach event listeners for the new folder items
+        navigatingFolder(windowId, folderContent.contents);
+      }
+    });
+  });
+};
+
+// Updated contentWindow function to include navigatingFolder
+const contentWindow = (item) => {
+  const { contents } = item;
+  const windowId = `window-${windowIdCounter}`; // Use the current windowIdCounter for the window ID
+
+  const initialContent = `<div class="file-explorer-content">
+                                <div class="file-list flex flex-col gap-2">
+                                  ${showContent(contents)}
+                                </div>
+                              </div>`;
+  setTimeout(() => navigatingFolder(windowId, contents), 0); // Attach folder navigation after the window is created
+  return initialContent;
 };

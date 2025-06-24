@@ -1,6 +1,6 @@
 [
     {
-        "AppName": "File Explorer",
+        "name": "File Explorer",
         "img": "./assets/file-explorer.png",
         "contents": [
             {
@@ -27,7 +27,7 @@
             }
         ]
     },{
-        "AppName":"notes",
+        "name":"notes",
         "img": "./assets/notes.png",
         "contents": [
             {
@@ -40,7 +40,7 @@
             }
         ]
     },{
-        "AppName":"recycle bin",
+        "name":"recycle bin",
         "img": "./assets/recycle.png",
         "contents": [
             {
