@@ -22,6 +22,72 @@ setInterval(clock, 60000);
 let windowIdCounter = 0;
 let zIndexCounter = 10; // Use a separate counter for z-index
 
+// Fetching of data from the JSON file
+const data = async () => {
+  try {
+    const response = await fetch("./data/data.json");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const jsonData = await response.json();
+    const icons = document.querySelector('.icons');
+
+    // Create icons dynamically
+    jsonData.forEach((item) => {
+      const iconContainer = createIconContainer(item.AppName, item.img);
+      icons.appendChild(iconContainer);
+    });
+
+    // Query the icons after they are appended to the DOM
+    const iconContainers = document.querySelectorAll(".icon-container");
+
+    // Add click event to each icon container to create a window
+    iconContainers.forEach((container) => {
+      const title = container.querySelector(".icon-label").textContent;
+      const img = container.querySelector("img").src;
+
+      container.addEventListener("dblclick", () => {
+        createWindow(title, "This is a new window.", img);
+      });
+    });
+
+    // Add dragging functionality to each icon container
+    iconContainers.forEach((container) => {
+      let isDragging = false;
+      let offsetX, offsetY;
+
+      container.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return; // Only drag with left mouse button
+
+        isDragging = true;
+        offsetX = e.clientX - container.offsetLeft;
+        offsetY = e.clientY - container.offsetTop;
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+        e.preventDefault();
+      });
+
+      const onMouseMove = (e) => {
+        if (isDragging) {
+          container.style.position = "absolute"; // Ensure the container is positioned absolutely
+          container.style.left = `${e.clientX - offsetX}px`;
+          container.style.top = `${e.clientY - offsetY}px`;
+        }
+      };
+
+      const onMouseUp = () => {
+        isDragging = false;
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      };
+    });
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+  }
+};
+
+data();
 function createWindow(title, content, img) {
   const windowId = `window-${windowIdCounter++}`;
 
@@ -151,7 +217,10 @@ function addTaskbarButtonFunctionality(windowElement, isActive, img) {
     } else {
       windowElement.style.display = "flex"; // Show the window again
       isActive = true; // Update the active state
-      windowElement.style.zIndex = zIndexCounter == windowElement.style.zIndex? ++zIndexCounter : windowElement.style.zIndex; // Bring to front
+      windowElement.style.zIndex =
+        zIndexCounter == windowElement.style.zIndex
+          ? ++zIndexCounter
+          : windowElement.style.zIndex; // Bring to front
     }
   });
 
@@ -160,42 +229,62 @@ function addTaskbarButtonFunctionality(windowElement, isActive, img) {
 
 // remove taskbar button when window is closed
 function removeTaskbarButton(windowElement) {
-    const button = document.getElementById(`taskbar-button-${windowElement.id}`);
-    if (button) {
-        button.remove();
-    }
+  const button = document.getElementById(`taskbar-button-${windowElement.id}`);
+  if (button) {
+    button.remove();
+  }
+}
+
+// function to create icon containers
+function createIconContainer(title, imgSrc) {
+  const container = document.createElement("div");
+  container.className =
+    "icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300";
+
+  const img = document.createElement("img");
+  img.src = imgSrc;
+  img.alt = title;
+  img.className = "icon w-12 object-cover "; // Set a fixed size for the icon image
+
+  const label = document.createElement("span");
+  label.className = "icon-label text-sm";
+  label.textContent = title;
+
+  container.appendChild(img);
+  container.appendChild(label);
+  return container;
 }
 
 const iconContainers = document.querySelectorAll(".icon-container");
 
 // Add click event to each icon container to create a window
-iconContainers.forEach(container => {
-    const title = container.querySelector(".icon-label").textContent;
-    const img = container.querySelector("img").src;
+iconContainers.forEach((container) => {
+  const title = container.querySelector(".icon-label").textContent;
+  const img = container.querySelector("img").src;
 
-    container.style.width = container.style.height;
+  container.style.width = container.style.height;
   container.addEventListener("dblclick", () => {
-    createWindow(title, "This is a new window.",img);
+    createWindow(title, "This is a new window.", img);
   });
 });
 
 // iconContainer dragging functionality
-iconContainers.forEach(container => {
+iconContainers.forEach((container) => {
   let isDragging = false;
   let offsetX, offsetY;
-  
+
   container.addEventListener("mousedown", (e) => {
     if (e.button !== 0) return; // Only drag with left mouse button
-    
+
     isDragging = true;
     offsetX = e.clientX - container.offsetLeft;
     offsetY = e.clientY - container.offsetTop;
-    
+
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
     e.preventDefault();
   });
-  
+
   const onMouseMove = (e) => {
     if (isDragging) {
       container.style.position = "absolute"; // Ensure the container is positioned absolutely
@@ -219,4 +308,4 @@ const content = () => {
       <img src="${img}" alt="${title}" class="window-image">
     </div>
   `;
-}
+};

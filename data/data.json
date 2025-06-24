@@ -1,35 +1,55 @@
 [
     {
-        "name": "File Explorer",
-        "type": "folder",
-        "img":"./assets/file-explorer.png",
+        "AppName": "File Explorer",
+        "img": "./assets/file-explorer.png",
         "contents": [
             {
                 "name": "Resume.txt",
-                "type": "file",
-                "img": "./assets/notes.png"
+                "type": "file"
             },
             {
                 "name": "Project",
                 "type": "folder",
-                "img": "./assets/folder.png",
                 "contents": [
                     {
                         "name": "index.html",
-                        "type": "file",
-                        "img": "./assets/html.png"
+                        "type": "file"
                     },
                     {
                         "name": "style.css",
-                        "type": "file",
-                        "img": "./assets/css.png"
+                        "type": "file"
                     },
                     {
                         "name": "script.js",
-                        "type": "file",
-                        "img": "./assets/js.png"
+                        "type": "file"
                     }
                 ]
+            }
+        ]
+    },{
+        "AppName":"notes",
+        "img": "./assets/notes.png",
+        "contents": [
+            {
+                "name": "Note1.txt",
+                "type": "file"
+            },
+            {
+                "name": "Note2.txt",
+                "type": "file"
+            }
+        ]
+    },{
+        "AppName":"recycle bin",
+        "img": "./assets/recycle.png",
+        "contents": [
+            {
+                "name": "DeletedFile1.txt",
+                "type": "file"
+            },
+            {
+                "name": "DeletedFile2.txt",
+                "type": "file"
             }
         ]
     }
