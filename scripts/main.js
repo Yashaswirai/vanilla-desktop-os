@@ -368,7 +368,12 @@ const changeWallpaper = () => {
   const newWallpaper = wallpaperSrc[idx++ % wallpaperSrc.length];
   const desktop = document.getElementById("desktop");
   desktop.style.backgroundImage = `url('${newWallpaper}')`;
-}
+  desktop.style.backgroundSize = "cover"; // Ensure the wallpaper covers the entire desktop
+  desktop.style.backgroundPosition = "center"; // Center the wallpaper
+  desktop.style.backgroundRepeat = "no-repeat"; // Prevent the wallpaper from repeating
+  // Save the selected wallpaper in localStorage for persistence
+  localStorage.setItem("selectedWallpaper", newWallpaper);
+};
 
 // Right-click context menu functionality
 const RightClickMenu = () => {
@@ -421,13 +426,16 @@ const changeTheme = () => {
 
   // Save the selected theme in localStorage for persistence
   localStorage.setItem("selectedTheme", themes[currentThemeIndex]);
-  console.log(`Theme changed to: ${themes[currentThemeIndex]}`);
 };
 
 // Apply the saved theme on page load
 document.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("selectedTheme");
+  const savedWallpaper = localStorage.getItem("selectedWallpaper");
   const desktop = document.getElementById("desktop");
+  if (savedWallpaper) {
+    desktop.style.backgroundImage = `url('${savedWallpaper}')`;
+  }
   if (savedTheme && themes.includes(savedTheme)) {
     desktop.classList.add(savedTheme);
     currentThemeIndex = themes.indexOf(savedTheme);
@@ -443,3 +451,30 @@ document.getElementById("change-theme").addEventListener("click", changeTheme);
 document.getElementById("refresh").addEventListener("click", () => {
   window.location.reload();
 });
+
+// Weather functionality
+const fetchWeather = async () => {
+  try {
+    const API_KEY = process.env.WEATHER_API_KEY || 'your-fallback-key';
+    const response = await fetch(
+      `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=kolkata&aqi=no`
+    );
+    const data = await response.json();
+    console.log("Weather data fetched successfully:", data);
+    
+    const weatherElement = document.getElementById("weather");
+    weatherElement.innerHTML = `
+      <img src="${data.current.condition.icon}" alt="Weather Icon" class="w-12 h-12">
+      <span class="text-lg tracking-wide">${data.current.temp_c}°C</span>
+    `;
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+    // Show fallback weather data
+    const weatherElement = document.getElementById("weather");
+    weatherElement.innerHTML = `
+      <img src="./assets/weather.png" alt="Weather Icon" class="w-12 h-12">
+      <span class="text-lg tracking-wide">25°C</span>
+    `;
+  }
+};
+fetchWeather();
