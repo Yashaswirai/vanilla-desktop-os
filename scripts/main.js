@@ -81,15 +81,15 @@ function createWindow(title, content, img) {
 
   // Use a class for the close button instead of an ID
   windowElement.innerHTML = `
-    <div class="window-header w-full bg-gray-800 text-white flex items-center justify-between p-1">
+    <div class="window-header w-full flex items-center justify-between p-1">
         <span class="window-title text-lg pl-2">${title}</span>
         <div class="flex items-center justify-end gap-2">
-            <button class="minimize-button text-gray-100 hover:bg-gray-100/45 cursor-pointer p-2 w-5">-</button>
+            <button class="minimize-button hover:bg-gray-100/45 cursor-pointer p-2 w-5">-</button>
             <button class="close-button text-red-500 hover:bg-gray-100/45 cursor-pointer p-2 w-5">X</button>
         </div>
     </div>
-    <div class="window-content p-2 bg-white text-black flex-grow overflow-auto">
-        <div>${content}</div>
+    <div class="window-content p-2 flex-grow overflow-auto">
+        <div class="window-content-inner">${content}</div>
     </div>`;
 
   document.getElementById("desktop").appendChild(windowElement);
@@ -187,6 +187,8 @@ function addTaskbarButtonFunctionality(windowElement, isActive, img) {
   button.className = "taskbar-button";
   button.id = `taskbar-button-${windowElement.id}`;
   button.src = img;
+  button.alt = "Taskbar Button";
+  button.style.cursor = "pointer";
   taskbar.appendChild(button);
   button.addEventListener("click", () => {
     // Bring the associated window to the front
@@ -218,7 +220,7 @@ function removeTaskbarButton(windowElement) {
 function createIconContainer(title, imgSrc, contents) {
   const container = document.createElement("div");
   container.className =
-    "icon-container w-24 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300";
+    "icon-container w-24 h-[fit-content] leading-none flex flex-col items-center rounded hover:cursor-pointer transition duration-300";
 
   const img = document.createElement("img");
   img.src = imgSrc;
@@ -284,17 +286,17 @@ const iconDraggable = (container) => {
 // Show content function to display files and folders
 const showContent = (contents) => {
   if (!contents || contents.length === 0) {
-    return `<div class="text-center text-gray-500">No files or folders found.</div>`;
+    return `<div class="text-center">No files or folders found.</div>`;
   }
   return contents
     .map((content) => {
       if (content.type === "file") {
-        return `<div class="file-item flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
+        return `<div class="file-item flex items-center gap-2 p-2 cursor-pointer">
                 <img src="./assets/file.png" alt="${content.name}" class="w-6 h-6 object-cover">
                 <span>${content.name}</span>
               </div>`;
       } else if (content.type === "folder") {
-        return `<div class="folder-item flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer" data-folder-name="${content.name}">
+        return `<div class="folder-item flex items-center gap-2 p-2 cursor-pointer" data-folder-name="${content.name}">
                 <img src="./assets/folder.png" alt="${content.name}" class="w-6 h-6 object-cover">
                 <span>${content.name}</span>
               </div>`;
@@ -403,4 +405,41 @@ const renameIcon = (iconContainer) => {
   });
 };
 
+const themes = ["theme-light", "theme-dark"];
+let currentThemeIndex = 0;
 
+const changeTheme = () => {
+  const desktop = document.getElementById("desktop");
+  // Remove the current theme class
+  desktop.classList.remove(themes[currentThemeIndex]);
+
+  // Update the theme index
+  currentThemeIndex = currentThemeIndex === 0 ? 1 : 0;
+
+  // Add the new theme class
+  desktop.classList.add(themes[currentThemeIndex]);
+
+  // Save the selected theme in localStorage for persistence
+  localStorage.setItem("selectedTheme", themes[currentThemeIndex]);
+  console.log(`Theme changed to: ${themes[currentThemeIndex]}`);
+};
+
+// Apply the saved theme on page load
+document.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("selectedTheme");
+  const desktop = document.getElementById("desktop");
+  if (savedTheme && themes.includes(savedTheme)) {
+    desktop.classList.add(savedTheme);
+    currentThemeIndex = themes.indexOf(savedTheme);
+  } else {
+    desktop.classList.add(themes[0]); // Default to light theme
+  }
+});
+
+// Add event listener for theme switching
+document.getElementById("change-theme").addEventListener("click", changeTheme);
+
+// On refresh the page will reload
+document.getElementById("refresh").addEventListener("click", () => {
+  window.location.reload();
+});

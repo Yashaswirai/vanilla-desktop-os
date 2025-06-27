@@ -1,3 +1,45 @@
+.theme-light{
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --taskbar-bg: rgba(255, 255, 255, 0.75);
+    --taskbar-border: rgba(0, 0, 0, 0.125);
+    --window-bg: rgba(255, 255, 255, 0.9);
+    --window-border: rgba(0, 0, 0, 0.125);
+    --window-header-bg: rgba(255, 255, 255, 0.9);
+    --window-header-border: rgba(0, 0, 0, 0.125);
+    --window-content-bg: rgba(255, 255, 255, 0.9);
+    --window-content-border: rgba(0, 0, 0, 0.125);
+    --window-content-text-color: #000000;
+    --window-header-text-color: #000000;
+    --icon-bg: rgba(255, 255, 255, 0.8);
+    --icon-border: rgba(0, 0, 0, 0.125);
+    --context-menu-bg: rgba(255, 255, 255, 0.9);
+    --context-menu-border: rgba(0, 0, 0, 0.125);
+    --context-menu-text-color: #000000;
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --hover-text-color: #000000;
+}
+.theme-dark{
+    --bg-color: #111928;
+    --text-color: #ffffff;
+    --taskbar-bg: rgba(17, 25, 40, 0.75);
+    --taskbar-border: rgba(255, 255, 255, 0.125);
+    --window-bg: rgba(17, 25, 40, 0.9);
+    --window-border: rgba(255, 255, 255, 0.125);
+    --window-header-bg: rgba(17, 25, 40, 0.9);
+    --window-header-border: rgba(255, 255, 255, 0.125);
+    --window-content-bg: rgba(17, 25, 40, 0.9);
+    --window-content-border: rgba(255, 255, 255, 0.125);
+    --window-content-text-color: #ffffff;
+    --window-header-text-color: #ffffff;
+    --icon-bg: rgba(17, 25, 40, 0.8);
+    --icon-border: rgba(255, 255, 255, 0.125);
+    --context-menu-bg: rgba(17, 25, 40, 0.9);
+    --context-menu-border: rgba(255, 255, 255, 0.125);
+    --context-menu-text-color: #ffffff;
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --hover-text-color: #ffffff;
+}
 *{
     margin: 0;
     padding: 0;
@@ -7,13 +49,13 @@
 html , body{
     height: 100%;
     width: 100%;
-    color: white;
+    color: var(--text-color);
 }
 #taskbar{
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(17, 25, 40, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.125);
+    background-color: var(--taskbar-bg);
+    border: 1px solid var(--taskbar-border);
     padding: 0 15px;
 }
 #taskbar::selection{
@@ -24,16 +66,66 @@ html , body{
 }
 .window-header{
     padding: 0 1%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--window-header-bg);
+    border: 1px solid var(--window-header-border);
+    color: var(--window-header-text-color);
+    font-weight: 600;
+    font-size: 1.2em;
+    height: 40px;
+    line-height: 40px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    -webkit-app-region: drag;
 }
 .window-header::selection{
     background-color: transparent;
 }
 .window-content{
     padding: 0 1%;
+    background-color: var(--window-content-bg);
+    border: 1px solid var(--window-content-border);
+    color: var(--window-content-text-color);
+    height: calc(100% - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 1em;
+    line-height: 1.5;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    -o-user-select: text;
+    -webkit-app-region: no-drag;
+}
+.window-content::selection{
+    background-color: transparent;
+}
+.file-item:hover, .folder-item:hover{
+    background-color: var(--hover-bg);
+    color: var(--hover-text-color);
+}
+.minimize-button{
+    color: var(--window-header-text-color);
 }
 .icon-container{
     padding: 5px;
     margin: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: var(--hover-bg); */
+    color: var(--hover-text-color);
+}
+.icon-container:hover{
+    background-color: var(--icon-bg);
+    color: var(--text-color);
+    border: 1px solid var(--icon-border);
 }
 
 .icon-container input{
@@ -41,6 +133,7 @@ html , body{
     padding: 0 2px;
     letter-spacing: 0.1px;
     line-height: 0.8;
+    width: 100%;
 }
 .icons{
     padding: 10px;
@@ -50,9 +143,9 @@ html , body{
     padding: 10px;
      backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(17, 25, 40, 0.75);
+    background-color: var(--context-menu-bg);
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.125);
+    border: 1px solid var(--context-menu-border);
 }
 #context-menu::selection{
     background-color: transparent;
@@ -61,7 +154,7 @@ html , body{
     padding: 5px 10px;
     cursor: pointer;
     list-style: none;
-    color: white;
+    color: var(--context-menu-text-color);
     display: flex;
     align-items: center;
 }
