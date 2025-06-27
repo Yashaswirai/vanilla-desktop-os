@@ -22,6 +22,12 @@ setInterval(clock, 60000);
 const iconContainers = document.querySelectorAll(".icon-container");
 let windowIdCounter = 0;
 let zIndexCounter = 10; // Use a separate counter for z-index
+let wallpaperSrc = [
+  "./assets/wallpapers/1.webp",
+  "./assets/wallpapers/2.jpg",
+  "./assets/wallpapers/3.jpg",
+  "./assets/wallpapers/4.jpg",
+];
 
 // Fetching of data from the JSON file
 const data = async () => {
@@ -40,6 +46,11 @@ const data = async () => {
         item.img,
         item.contents
       );
+      const inputFiled = iconContainer.querySelector("input");
+      inputFiled.addEventListener("click", () => {
+        inputFiled.style.cursor = text;
+      });
+
       icons.appendChild(iconContainer);
       initializeIcon(iconContainer, item);
     });
@@ -207,17 +218,18 @@ function removeTaskbarButton(windowElement) {
 function createIconContainer(title, imgSrc, contents) {
   const container = document.createElement("div");
   container.className =
-    "icon-container w-18 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300";
+    "icon-container w-24 h-[fit-content] leading-none flex flex-col items-center rounded shadow-lg hover:cursor-pointer hover:bg-gray-200/50 transition duration-300";
 
   const img = document.createElement("img");
   img.src = imgSrc;
   img.alt = title;
   img.className = "icon w-12 object-cover "; // Set a fixed size for the icon image
 
-  const label = document.createElement("span");
+  const label = document.createElement("input");
   label.className = "icon-label text-sm";
-  label.textContent = title;
-
+  label.value = title;
+  label.type = "text";
+  // label.readOnly = true; // Make the label read-only to prevent editing
   container.appendChild(img);
   container.appendChild(label);
   return container;
@@ -230,6 +242,11 @@ const clickEventIcon = (container, item) => {
   container.style.width = container.style.height;
   container.addEventListener("dblclick", () => {
     createWindow(title, contentWindow(item), img);
+  });
+  const inputField = container.querySelector("input");
+  inputField.addEventListener("dblclick", (e) => {
+    e.stopPropagation(); // Prevent the container's dblclick event
+    renameIcon(container);
   });
 };
 
@@ -264,8 +281,11 @@ const iconDraggable = (container) => {
     document.removeEventListener("mouseup", onMouseUp);
   };
 };
-
+// Show content function to display files and folders
 const showContent = (contents) => {
+  if (!contents || contents.length === 0) {
+    return `<div class="text-center text-gray-500">No files or folders found.</div>`;
+  }
   return contents
     .map((content) => {
       if (content.type === "file") {
@@ -322,3 +342,65 @@ const contentWindow = (item) => {
   setTimeout(() => navigatingFolder(windowId, contents), 0); // Attach folder navigation after the window is created
   return initialContent;
 };
+
+// Function to add a new folder
+const addNewFolder = () => {
+  const icons = document.querySelector(".icons");
+  const newFolder = createIconContainer(
+    "New Folder",
+    "./assets/folder.png",
+    []
+  );
+  newFolder.classList.add("new-folder");
+  icons.appendChild(newFolder);
+  initializeIcon(newFolder, {
+    name: "New Folder",
+    img: "./assets/folder.png",
+    contents: [],
+  });
+};
+let idx = 1;
+// Randomly select a wallpaper from the array
+// change wallpaper functionality
+const changeWallpaper = () => {
+  const newWallpaper = wallpaperSrc[idx++ % wallpaperSrc.length];
+  const desktop = document.getElementById("desktop");
+  desktop.style.backgroundImage = `url('${newWallpaper}')`;
+}
+
+// Right-click context menu functionality
+const RightClickMenu = () => {
+  const contextMenu = document.getElementById("context-menu");
+  const desktop = document.getElementById("desktop");
+
+  desktop.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    contextMenu.style.display = "block";
+    contextMenu.style.left = `${e.pageX}px`;
+    contextMenu.style.top = `${e.pageY}px`;
+  });
+
+  document.addEventListener("click", () => {
+    contextMenu.style.display = "none"; // Hide the menu on click outside
+  });
+  // Add event listener for the "Create Folder" button
+  const newFolderButton = document.getElementById("create-folder");
+  newFolderButton.addEventListener("click", addNewFolder);
+
+  // Add event listener for the "Change Wallpaper" button
+  const changeWallpaperButton = document.getElementById("change-wallpaper");
+  changeWallpaperButton.addEventListener("click", changeWallpaper);
+};
+RightClickMenu();
+
+// Rename functionality
+const renameIcon = (iconContainer) => {
+  const inputField = iconContainer.querySelector("input");
+  inputField.removeAttribute("readonly");
+  inputField.focus();
+  inputField.addEventListener("blur", () => {
+    inputField.setAttribute("readonly", true);
+  });
+};
+
+

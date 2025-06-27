@@ -10,14 +10,24 @@
 </head>
 
 <body>
-    <div id="desktop" class="w-full h-screen overflow-hidden bg-[url('./assets/desktop.jpg')] bg-cover bg-center relative">
+    <div id="desktop" class="w-full h-screen overflow-hidden bg-[url('./assets/wallpapers/1.webp')] bg-cover bg-center relative">
         <div class="icons w-full h-full relative flex flex-col flex-wrap">
             
+        </div>
+        <div id="context-menu" class="absolute hidden bg-white shadow-lg rounded-lg p-4 z-80">
+            <ul class="list-none m-0 p-0">
+                <li id="create-folder" class="hover:bg-gray-200/10 rounded mb-1 cursor-pointer"><img src="./assets/folder.png" alt="">Create Folder</li>
+                <li id="refresh" class="hover:bg-gray-200/10 rounded mb-1 cursor-pointer"><img src="./assets/refresh.png" alt="">Refresh</li>
+                <li id="change-wallpaper" class="hover:bg-gray-200/10 rounded mb-1 cursor-pointer"><img src="./assets/change-wallpaper.png" alt="">Change Wallpaper</li>
+                <li id="show-more-options" class="hover:bg-gray-200/10 rounded mb-1 cursor-pointer"><img src="./assets/options.png" alt="">Show more options</li>
+            </ul>
         </div>
         <div id="taskbar"
             class="absolute bottom-0 left-0 w-screen h-12 bg-gray-800 flex items-center justify-between z-100">
             <div id="weather"></div>
-            <div id="taskbar-icons" class="flex space-x-4"></div>
+            <div id="taskbar-icons" class="flex space-x-4">
+                <img src="./assets/windows.png" alt="Start Menu" class="w-12 h-12 cursor-pointer" id="start-menu-icon">
+            </div>
             <div id="clock" class="text-white text-lg tracking-wide"></div>
         </div>
     </div>

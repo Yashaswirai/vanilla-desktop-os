@@ -37,6 +37,16 @@
             {
                 "name": "Note2.txt",
                 "type": "file"
+            },
+            {
+                "name":"PrivateNote",
+                "type":"folder",
+                "contents": [
+                    {
+                        "name": "SecretNote.txt",
+                        "type": "file"
+                    }
+                ]
             }
         ]
     },{
