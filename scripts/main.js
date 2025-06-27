@@ -455,9 +455,8 @@ document.getElementById("refresh").addEventListener("click", () => {
 // Weather functionality
 const fetchWeather = async () => {
   try {
-    const API_KEY = process.env.WEATHER_API_KEY || 'your-fallback-key';
     const response = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=kolkata&aqi=no`
+      `http://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=kolkata&aqi=no`
     );
     const data = await response.json();
     console.log("Weather data fetched successfully:", data);
