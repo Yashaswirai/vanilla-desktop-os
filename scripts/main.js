@@ -452,19 +452,41 @@ document.getElementById("refresh").addEventListener("click", () => {
   window.location.reload();
 });
 
+const loc = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      console.log("Latitude:", lat, "Longitude:", lon);
+      fetchWeather(lat, lon); // Pass the coordinates to fetchWeather
+    }, (error) => {
+      console.error("Error getting location:", error);
+      // Fallback to a default location if geolocation fails
+      fetchWeather(0, 0); // Default coordinates
+    });
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+    // Fallback to a default location if geolocation is not supported
+    fetchWeather(0, 0); // Default coordinates
+  }
+};
+loc();
+
 // Weather functionality
-const fetchWeather = async () => {
+const fetchWeather = async (lat,lon) => {
   try {
     const response = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=kolkata&aqi=no`
+      `http://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=${lat},${lon}&aqi=no`
     );
     const data = await response.json();
     console.log("Weather data fetched successfully:", data);
     
     const weatherElement = document.getElementById("weather");
     weatherElement.innerHTML = `
-      <img src="${data.current.condition.icon}" alt="Weather Icon" class="w-12 h-12">
-      <span class="text-lg tracking-wide">${data.current.temp_c}°C</span>
+      <img src="${data?.current.condition?.icon}" alt="Weather Icon" class="w-12 h-12">
+      <div class="text-sm tracking-wide">${data?.location.name}, ${data?.location.country}
+      <div class="text-lg tracking-wide">${data?.current.temp_c}°C</div>
+      </div>
     `;
   } catch (error) {
     console.error("Error fetching weather data:", error);
