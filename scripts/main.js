@@ -483,9 +483,9 @@ const fetchWeather = async (lat,lon) => {
     
     const weatherElement = document.getElementById("weather");
     weatherElement.innerHTML = `
-      <img src="${data?.current.condition?.icon}" alt="Weather Icon" class="w-12 h-12">
-      <div class="text-sm tracking-wide">${data?.location.name}, ${data?.location.country}
-      <div class="text-lg tracking-wide">${data?.current.temp_c}°C</div>
+      <img src="${data?.current?.condition?.icon}" alt="Weather Icon" class="w-12 h-12">
+      <div class="text-sm tracking-wide">${data?.location?.name}, ${data?.location?.country}
+      <div class="text-lg tracking-wide">${data?.current?.temp_c}°C</div>
       </div>
     `;
   } catch (error) {
@@ -498,4 +498,3 @@ const fetchWeather = async (lat,lon) => {
     `;
   }
 };
-fetchWeather();
