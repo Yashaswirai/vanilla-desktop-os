@@ -22,16 +22,35 @@
                 <li id="show-more-options" class="hover:bg-gray-200/10 rounded mb-1 cursor-pointer"><img src="./assets/options.png" alt="">Show more options</li>
             </ul>
         </div>
-        <div id="taskbar"
-            class="absolute bottom-0 left-0 w-screen h-12 flex items-center justify-between z-100">
-            <div id="weather" class="flex items-center space-x-2 ml-4">
-                <img src="./assets/weather.png" alt="Weather" class="w-12 h-12">
-                <span class="text-lg tracking-wide">25°C</span>
+         <div class="menu">
+            <input type="text" placeholder="Search for apps, settings and documents">
+            <div class="apps">
+                <div class="heading">
+                    <h1>Recommended</h1>
+                    <button>All Apps</button>
+                </div>
+                <div class="apps">
+                    <img src="./assets/file.png" alt="">
+                    <img src="./assets/folder.png" alt="">
+                    <img src="./assets/file-explorer.png" alt="">
+                </div>
             </div>
-            <div id="taskbar-icons" class="flex space-x-4">
-                <img src="./assets/windows.png" alt="Start Menu" class="w-12 h-12 cursor-pointer" id="start-menu-icon">
+        </div>
+        <div class="taskbar">
+            <div class="weather">
+                <img class="weather-icon" src="./assets/weather.png" alt="loading">
+                <div>
+                    <div class="weather-temp">25°C</div>
+                    <div class="weather-city">City</div>
+                </div>
             </div>
-            <div id="clock" class="text-lg tracking-wide"></div>
+            <div class="btns">
+                <img class="window-btn" src="./assets/windows.png" alt="windows">
+            </div>
+            <div class="dateCalendar">
+                <div class="date">11:23pm</div>
+                <div class="calendar">28/06/2025</div>
+            </div>
         </div>
     </div>
     <script src="./scripts/main.js"></script>

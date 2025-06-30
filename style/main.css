@@ -164,3 +164,106 @@ html , body{
     height: 16px;
     margin-right: 5px;
 }
+.taskbar {
+  width: 100vw;
+  height: 3rem;
+  position: absolute;
+  bottom: 0;
+  background-color: var(--taskbar-bg);
+  color: var(--text-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 1rem;
+}
+.taskbar .weather {
+    width: 8vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+.taskbar .weather img {
+  width: 2.5rem;
+}
+.taskbar .btns {
+  height: 100%;
+}
+.taskbar .btns img {
+  height: 2.4rem;
+  cursor: pointer;
+}
+.taskbar .btns:hover {
+  background-color: var(--hover-bg);
+  border-radius: 0.1rem;
+}
+.taskbar .dateCalendar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+}
+.taskbar .dateCalendar .date {
+  font-size: 0.9rem;
+}
+.taskbar .dateCalendar .calendar {
+  font-size: 1rem;
+}
+
+.menu {
+  width: 45rem;
+  height: 35rem;
+  position: absolute;
+  display: none;
+  transition: all ease-in cubic-bezier(0.47, 0, 0.745, 0.715);
+  transform: translateX(-50%);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  left: 50%;
+  bottom: 8%;
+  background-color: var(--taskbar-bg);
+  color: var(--text-color);
+}
+.menu input {
+  width: 100%;
+  border-radius: 1rem;
+  padding: 0.4rem 0.5rem;
+  background: transparent;
+  outline: none;
+  border: 1px solid gray;
+}
+.menu .apps {
+  margin-top: 2rem;
+}
+.menu .apps .heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.menu .apps .heading h1 {
+  font-size: 1rem;
+}
+.menu .apps .heading button {
+  font-size: 0.8rem;
+  background-color: var(--hover-bg);
+  border: none;
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.2rem;
+}
+.menu .apps .apps {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.menu .apps .apps img {
+  width: 3rem;
+  padding: 0.1rem;
+}
+.menu .apps .apps img:hover {
+  background-color: var(--hover-bg);
+  border-radius: 0.2rem;
+}

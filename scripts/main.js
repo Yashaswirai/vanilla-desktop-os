@@ -1,23 +1,65 @@
-function clock() {
-  const time = Date.now();
-  let HH = new Date(time).getHours();
-  let mm = new Date(time).getMinutes();
-  if (HH < 10) {
-    HH = `0${HH}`;
-  }
-  if (mm < 10) {
-    mm = `0${mm}`;
-  }
-  let timeString = `${HH}:${mm}`;
-  if (HH > 12 && HH < 24) {
-    timeString = `${HH - 12}:${mm} PM`;
+const loc = navigator.geolocation;
+let lon, lat;
+loc.getCurrentPosition(async (position) => {
+  lon = position.coords.longitude;
+  lat = position.coords.latitude;
+  const res = await fetch(
+    `https://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=${lat},${lon}&aqi=no`
+  );
+  const data = await res.json();
+  console.log(data);
+  let icon = document.querySelector(".weather-icon");
+  let temp = document.querySelector(".weather-temp");
+  let city = document.querySelector(".weather-city");
+  icon.src = data.current.condition.icon;
+  temp.innerHTML = data.current.temp_c + " °C";
+  city.innerHTML = data.location.name;
+});
+const timeCalendar = () => {
+  const date = document.querySelector(".date");
+  const calend = document.querySelector(".calendar");
+  let dt = new Date();
+  let HH = dt.getHours();
+  let MM = dt.getMinutes();
+  let dte = dt.getDate();
+  let month = dt.getMonth();
+  let year = dt.getFullYear();
+  calend.innerHTML = `${dte}/${month+1}/${year}`
+  
+  if (HH < 12) {
+    if (HH < 10) {
+      HH = "0" + HH;
+    }
+    if (MM < 10) {
+      MM = "0" + MM;
+    }
+    date.innerHTML = `${HH}:${MM} AM`;
   } else {
-    timeString = `${HH}:${mm} AM`;
+    if (HH - 12 < 10) {
+      HH = "0" + (HH - 12);
+    } else {
+      HH = HH - 12;
+    }
+    if (MM < 10) {
+      MM = "0" + MM;
+    }
+    date.innerHTML = `${HH}:${MM} PM`;
   }
-  document.getElementById("clock").textContent = timeString;
-}
-clock();
-setInterval(clock, 60000);
+};
+timeCalendar();
+setInterval(() => {
+    timeCalendar();
+}, 10000);
+
+const menu = document.querySelector(".menu")
+document.querySelector(".window-btn").addEventListener("click",()=>{
+  menu.style.display = menu.style.display === "none" ? "block" : "none";
+})
+document.addEventListener("click", (e) => {
+  if (!menu.contains(e.target) && !document.querySelector(".window-btn").contains(e.target)) {
+    menu.style.display = "none"; // Hide the menu if clicked outside
+  }
+});
 
 const iconContainers = document.querySelectorAll(".icon-container");
 let windowIdCounter = 0;
@@ -38,7 +80,6 @@ const data = async () => {
     }
     const jsonData = await response.json();
     const icons = document.querySelector(".icons");
-
     // Create icons dynamically
     jsonData.forEach((item) => {
       const iconContainer = createIconContainer(
@@ -239,7 +280,7 @@ function createIconContainer(title, imgSrc, contents) {
 
 // Add click event to each icon container to create a window
 const clickEventIcon = (container, item) => {
-  const title = item.name;
+  let title = item.name;
   const img = item.img;
   container.style.width = container.style.height;
   container.addEventListener("dblclick", () => {
@@ -248,7 +289,22 @@ const clickEventIcon = (container, item) => {
   const inputField = container.querySelector("input");
   inputField.addEventListener("dblclick", (e) => {
     e.stopPropagation(); // Prevent the container's dblclick event
-    renameIcon(container);
+
+    // Pass a callback to handle the new title
+    renameIcon(container, (newTitle) => {
+      title = newTitle; // Update the title when rename is complete
+
+      // Update the title of the window if it exists
+      const windowElement = document.getElementById(
+        `window-${windowIdCounter - 1}`
+      );
+      if (windowElement) {
+        const windowTitle = windowElement.querySelector(".window-title");
+        if (windowTitle) {
+          windowTitle.textContent = title; // Update the window title
+        }
+      }
+    });
   });
 };
 
@@ -401,13 +457,32 @@ const RightClickMenu = () => {
 RightClickMenu();
 
 // Rename functionality
-const renameIcon = (iconContainer) => {
+const renameIcon = (iconContainer, callback) => {
   const inputField = iconContainer.querySelector("input");
   inputField.removeAttribute("readonly");
   inputField.focus();
-  inputField.addEventListener("blur", () => {
-    inputField.setAttribute("readonly", true);
-  });
+
+  inputField.addEventListener(
+    "blur",
+    () => {
+      const newName = inputField.value.trim();
+      if (newName) {
+        inputField.value = newName; // Update the input field with the new name
+        iconContainer.querySelector("img").alt = newName; // Update the alt text of the icon image
+      } else {
+        inputField.value = iconContainer.querySelector("img").alt; // Reset to original name if empty
+      }
+      // Reapply the readonly attribute to prevent further editing
+      inputField.setAttribute("readonly", true);
+      console.log(`Icon renamed to: ${inputField.value}`);
+
+      // Call the callback with the new name
+      if (callback) {
+        callback(inputField.value);
+      }
+    },
+    { once: true }
+  ); // Use { once: true } to ensure the event listener is removed after firing
 };
 
 const themes = ["theme-light", "theme-dark"];
@@ -452,49 +527,52 @@ document.getElementById("refresh").addEventListener("click", () => {
   window.location.reload();
 });
 
-const loc = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      console.log("Latitude:", lat, "Longitude:", lon);
-      fetchWeather(lat, lon); // Pass the coordinates to fetchWeather
-    }, (error) => {
-      console.error("Error getting location:", error);
-      // Fallback to a default location if geolocation fails
-      fetchWeather(0, 0); // Default coordinates
-    });
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-    // Fallback to a default location if geolocation is not supported
-    fetchWeather(0, 0); // Default coordinates
-  }
-};
-loc();
+// const loc = () => {
+//   if (navigator.geolocation) {
+//     navigator.geolocation.getCurrentPosition(
+//       (position) => {
+//         const lat = position.coords.latitude;
+//         const lon = position.coords.longitude;
+//         console.log("Latitude:", lat, "Longitude:", lon);
+//         fetchWeather(lat, lon); // Pass the coordinates to fetchWeather
+//       },
+//       (error) => {
+//         console.error("Error getting location:", error);
+//         // Fallback to a default location if geolocation fails
+//         fetchWeather(0, 0); // Default coordinates
+//       }
+//     );
+//   } else {
+//     console.error("Geolocation is not supported by this browser.");
+//     // Fallback to a default location if geolocation is not supported
+//     fetchWeather(0, 0); // Default coordinates
+//   }
+// };
+// loc();
 
-// Weather functionality
-const fetchWeather = async (lat,lon) => {
-  try {
-    const response = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=${lat},${lon}&aqi=no`
-    );
-    const data = await response.json();
-    console.log("Weather data fetched successfully:", data);
-    
-    const weatherElement = document.getElementById("weather");
-    weatherElement.innerHTML = `
-      <img src="${data?.current?.condition?.icon}" alt="Weather Icon" class="w-12 h-12">
-      <div class="text-sm tracking-wide">${data?.location?.name}, ${data?.location?.country}
-      <div class="text-lg tracking-wide">${data?.current?.temp_c}°C</div>
-      </div>
-    `;
-  } catch (error) {
-    console.error("Error fetching weather data:", error);
-    // Show fallback weather data
-    const weatherElement = document.getElementById("weather");
-    weatherElement.innerHTML = `
-      <img src="./assets/weather.png" alt="Weather Icon" class="w-12 h-12">
-      <span class="text-lg tracking-wide">25°C</span>
-    `;
-  }
-};
+// // Weather functionality
+// const fetchWeather = async (lat, lon) => {
+//   try {
+//     const response = await fetch(
+//       `https://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=${lat},${lon}&aqi=no`
+//     );
+//     const data = await response.json();
+//     console.log("Weather data fetched successfully:", data);
+
+//     const weatherElement = document.getElementById("weather");
+//     weatherElement.innerHTML = `
+//       <img src="${data?.current?.condition?.icon}" alt="Weather Icon" class="w-12 h-12">
+//       <div class="text-sm tracking-wide">${data?.location?.name}, ${data?.location?.country}
+//       <div class="text-lg tracking-wide">${data?.current?.temp_c}°C</div>
+//       </div>
+//     `;
+//   } catch (error) {
+//     console.error("Error fetching weather data:", error);
+//     // Show fallback weather data
+//     const weatherElement = document.getElementById("weather");
+//     weatherElement.innerHTML = `
+//       <img src="./assets/weather.png" alt="Weather Icon" class="w-12 h-12">
+//       <span class="text-lg tracking-wide">25°C</span>
+//     `;
+//   }
+// };
