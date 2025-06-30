@@ -138,10 +138,10 @@ function createWindow(title, content, img) {
   // Pass the new element directly to the handler functions
 
   dragWindow(windowElement);
-  focusWindow(windowElement, isActive);
+  focusWindow(windowElement);
   addCloseButtonFunctionality(windowElement);
-  addMinimizeButtonFunctionality(windowElement, isActive);
-  addTaskbarButtonFunctionality(windowElement, isActive, img);
+  addMinimizeButtonFunctionality(windowElement); // Remove isActive parameter
+  addTaskbarButtonFunctionality(windowElement, true, img); // Keep the img parameter
 }
 
 // Function to handle dragging of windows
@@ -206,47 +206,52 @@ function addCloseButtonFunctionality(windowElement) {
 }
 
 // minimize Button Functionality
-function addMinimizeButtonFunctionality(windowElement, isActive) {
+function addMinimizeButtonFunctionality(windowElement) {
   const minimizeButton = windowElement.querySelector(".minimize-button");
   if (minimizeButton) {
-    minimizeButton.addEventListener("click", () => {
-      if (isActive) {
-        windowElement.style.display = "none"; // Hide the window
-        isActive = false; // Update the active state
-      } else {
-        windowElement.style.display = "flex"; // Show the window again
-        isActive = true; // Update the active state
-      }
+    minimizeButton.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent event bubbling
+      
+      // Simply hide the window
+      windowElement.style.display = "none";
     });
   }
 }
 
 // Add taskbar button functionality
 function addTaskbarButtonFunctionality(windowElement, isActive, img) {
-  const taskbar = document.getElementById("taskbar-icons");
+  // Use the correct selector - look for .btns class
+  const taskbar = document.querySelector(".btns");
+  
+  // Add error checking
+  if (!taskbar) {
+    console.error("Taskbar container not found");
+    return;
+  }
+  
   const button = document.createElement("img");
   button.className = "taskbar-button";
   button.id = `taskbar-button-${windowElement.id}`;
   button.src = img;
   button.alt = "Taskbar Button";
   button.style.cursor = "pointer";
+  button.style.width = "32px";  // Set a fixed width
+  button.style.height = "32px"; // Set a fixed height
+  button.style.marginRight = "4px"; // Add some spacing
+  
   taskbar.appendChild(button);
+  
   button.addEventListener("click", () => {
-    // Bring the associated window to the front
-    if (isActive) {
+    // Check current window state instead of relying on isActive parameter
+    const isCurrentlyVisible = windowElement.style.display !== "none";
+    
+    if (isCurrentlyVisible) {
       windowElement.style.display = "none"; // Hide the window
-      isActive = false; // Update the active state
     } else {
       windowElement.style.display = "flex"; // Show the window again
-      isActive = true; // Update the active state
-      windowElement.style.zIndex =
-        zIndexCounter == windowElement.style.zIndex
-          ? ++zIndexCounter
-          : windowElement.style.zIndex; // Bring to front
+      windowElement.style.zIndex = zIndexCounter++; // Bring to front
     }
   });
-
-  taskbar.appendChild(button);
 }
 
 // remove taskbar button when window is closed

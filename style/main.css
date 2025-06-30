@@ -193,10 +193,6 @@ html , body{
   height: 2.4rem;
   cursor: pointer;
 }
-.taskbar .btns:hover {
-  background-color: var(--hover-bg);
-  border-radius: 0.1rem;
-}
 .taskbar .dateCalendar {
   display: flex;
   justify-content: center;
@@ -266,4 +262,22 @@ html , body{
 .menu .apps .apps img:hover {
   background-color: var(--hover-bg);
   border-radius: 0.2rem;
+}
+.taskbar-button {
+  width: 32px;
+  height: 32px;
+  margin-right: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  padding: 2px;
+}
+
+.taskbar-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btns {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
