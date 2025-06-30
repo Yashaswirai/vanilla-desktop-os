@@ -142,6 +142,7 @@ function createWindow(title, content, img) {
   addCloseButtonFunctionality(windowElement);
   addMinimizeButtonFunctionality(windowElement); // Remove isActive parameter
   addTaskbarButtonFunctionality(windowElement, true, img); // Keep the img parameter
+  resizeWindows(windowElement); // Add resize functionality
 }
 
 // Function to handle dragging of windows
@@ -151,6 +152,13 @@ function dragWindow(windowElement) {
   let offsetX, offsetY;
 
   const onMouseDown = (e) => {
+    // Don't start dragging if clicking on resize handles or buttons
+    if (e.target.classList.contains('resize-handle') || 
+        e.target.classList.contains('minimize-button') || 
+        e.target.classList.contains('close-button')) {
+      return;
+    }
+    
     if (e.button !== 0) return; // Only drag with left mouse button
 
     isDragging = true;
@@ -165,8 +173,15 @@ function dragWindow(windowElement) {
 
   const onMouseMove = (e) => {
     if (isDragging) {
-      windowElement.style.left = `${e.clientX - offsetX}px`;
-      windowElement.style.top = `${e.clientY - offsetY}px`;
+      let newLeft = e.clientX - offsetX;
+      let newTop = e.clientY - offsetY;
+      
+      // Keep window within screen bounds
+      newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - 100));
+      newTop = Math.max(0, Math.min(newTop, window.innerHeight - 50));
+      
+      windowElement.style.left = `${newLeft}px`;
+      windowElement.style.top = `${newTop}px`;
     }
   };
 
@@ -532,52 +547,163 @@ document.getElementById("refresh").addEventListener("click", () => {
   window.location.reload();
 });
 
-// const loc = () => {
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(
-//       (position) => {
-//         const lat = position.coords.latitude;
-//         const lon = position.coords.longitude;
-//         console.log("Latitude:", lat, "Longitude:", lon);
-//         fetchWeather(lat, lon); // Pass the coordinates to fetchWeather
-//       },
-//       (error) => {
-//         console.error("Error getting location:", error);
-//         // Fallback to a default location if geolocation fails
-//         fetchWeather(0, 0); // Default coordinates
-//       }
-//     );
-//   } else {
-//     console.error("Geolocation is not supported by this browser.");
-//     // Fallback to a default location if geolocation is not supported
-//     fetchWeather(0, 0); // Default coordinates
-//   }
-// };
-// loc();
-
-// // Weather functionality
-// const fetchWeather = async (lat, lon) => {
-//   try {
-//     const response = await fetch(
-//       `https://api.weatherapi.com/v1/current.json?key=8b255b5a5c864081b6e55252252706&q=${lat},${lon}&aqi=no`
-//     );
-//     const data = await response.json();
-//     console.log("Weather data fetched successfully:", data);
-
-//     const weatherElement = document.getElementById("weather");
-//     weatherElement.innerHTML = `
-//       <img src="${data?.current?.condition?.icon}" alt="Weather Icon" class="w-12 h-12">
-//       <div class="text-sm tracking-wide">${data?.location?.name}, ${data?.location?.country}
-//       <div class="text-lg tracking-wide">${data?.current?.temp_c}°C</div>
-//       </div>
-//     `;
-//   } catch (error) {
-//     console.error("Error fetching weather data:", error);
-//     // Show fallback weather data
-//     const weatherElement = document.getElementById("weather");
-//     weatherElement.innerHTML = `
-//       <img src="./assets/weather.png" alt="Weather Icon" class="w-12 h-12">
-//       <span class="text-lg tracking-wide">25°C</span>
-//     `;
-//   }
-// };
+// window resize functionality
+// Comprehensive window resize functionality
+const resizeWindows = (windowElement) => {
+  // Create all resize handles
+  const resizeHandles = `
+    <!-- Corner handles -->
+    <div class="resize-handle resize-nw" data-direction="nw"></div>
+    <div class="resize-handle resize-ne" data-direction="ne"></div>
+    <div class="resize-handle resize-sw" data-direction="sw"></div>
+    <div class="resize-handle resize-se" data-direction="se"></div>
+    
+    <!-- Edge handles -->
+    <div class="resize-handle resize-n" data-direction="n"></div>
+    <div class="resize-handle resize-s" data-direction="s"></div>
+    <div class="resize-handle resize-w" data-direction="w"></div>
+    <div class="resize-handle resize-e" data-direction="e"></div>
+  `;
+  
+  // Create a container for resize handles
+  const resizeContainer = document.createElement("div");
+  resizeContainer.className = "resize-container";
+  resizeContainer.innerHTML = resizeHandles;
+  windowElement.appendChild(resizeContainer);
+  
+  // Set minimum dimensions
+  const minWidth = 300;
+  const minHeight = 200;
+  
+  let isResizing = false;
+  let currentDirection = null;
+  let startX, startY, startWidth, startHeight, startLeft, startTop;
+  
+  // Add event listeners to all resize handles
+  const handles = windowElement.querySelectorAll('.resize-handle');
+  
+  handles.forEach(handle => {
+    handle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      currentDirection = handle.dataset.direction;
+      
+      // Store initial values
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = parseInt(getComputedStyle(windowElement).width, 10);
+      startHeight = parseInt(getComputedStyle(windowElement).height, 10);
+      startLeft = parseInt(getComputedStyle(windowElement).left, 10);
+      startTop = parseInt(getComputedStyle(windowElement).top, 10);
+      
+      // Add global event listeners
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+      
+      // Prevent default behavior
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+  
+  const onMouseMove = (e) => {
+    if (!isResizing) return;
+    
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    
+    let newWidth = startWidth;
+    let newHeight = startHeight;
+    let newLeft = startLeft;
+    let newTop = startTop;
+    
+    // Calculate new dimensions based on resize direction
+    switch (currentDirection) {
+      case 'se': // Southeast (bottom-right)
+        newWidth = Math.max(minWidth, startWidth + deltaX);
+        newHeight = Math.max(minHeight, startHeight + deltaY);
+        break;
+        
+      case 'sw': // Southwest (bottom-left)
+        newWidth = Math.max(minWidth, startWidth - deltaX);
+        newHeight = Math.max(minHeight, startHeight + deltaY);
+        if (newWidth > minWidth || deltaX < 0) {
+          newLeft = startLeft + deltaX;
+        }
+        if (newWidth === minWidth && deltaX > 0) {
+          newLeft = startLeft + startWidth - minWidth;
+        }
+        break;
+        
+      case 'ne': // Northeast (top-right)
+        newWidth = Math.max(minWidth, startWidth + deltaX);
+        newHeight = Math.max(minHeight, startHeight - deltaY);
+        if (newHeight > minHeight || deltaY > 0) {
+          newTop = startTop + deltaY;
+        }
+        if (newHeight === minHeight && deltaY < 0) {
+          newTop = startTop + startHeight - minHeight;
+        }
+        break;
+        
+      case 'nw': // Northwest (top-left)
+        newWidth = Math.max(minWidth, startWidth - deltaX);
+        newHeight = Math.max(minHeight, startHeight - deltaY);
+        if (newWidth > minWidth || deltaX < 0) {
+          newLeft = startLeft + deltaX;
+        }
+        if (newHeight > minHeight || deltaY > 0) {
+          newTop = startTop + deltaY;
+        }
+        if (newWidth === minWidth && deltaX > 0) {
+          newLeft = startLeft + startWidth - minWidth;
+        }
+        if (newHeight === minHeight && deltaY < 0) {
+          newTop = startTop + startHeight - minHeight;
+        }
+        break;
+        
+      case 'n': // North (top)
+        newHeight = Math.max(minHeight, startHeight - deltaY);
+        if (newHeight > minHeight || deltaY > 0) {
+          newTop = startTop + deltaY;
+        }
+        if (newHeight === minHeight && deltaY < 0) {
+          newTop = startTop + startHeight - minHeight;
+        }
+        break;
+        
+      case 's': // South (bottom)
+        newHeight = Math.max(minHeight, startHeight + deltaY);
+        break;
+        
+      case 'e': // East (right)
+        newWidth = Math.max(minWidth, startWidth + deltaX);
+        break;
+        
+      case 'w': // West (left)
+        newWidth = Math.max(minWidth, startWidth - deltaX);
+        if (newWidth > minWidth || deltaX < 0) {
+          newLeft = startLeft + deltaX;
+        }
+        if (newWidth === minWidth && deltaX > 0) {
+          newLeft = startLeft + startWidth - minWidth;
+        }
+        break;
+    }
+    
+    // Apply new dimensions and position
+    windowElement.style.width = `${newWidth}px`;
+    windowElement.style.height = `${newHeight}px`;
+    windowElement.style.left = `${newLeft}px`;
+    windowElement.style.top = `${newTop}px`;
+  };
+  
+  const onMouseUp = () => {
+    isResizing = false;
+    currentDirection = null;
+    
+    // Remove global event listeners
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+};

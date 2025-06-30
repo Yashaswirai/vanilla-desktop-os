@@ -281,3 +281,99 @@ html , body{
   align-items: center;
   gap: 4px;
 }
+/* Resize container */
+.resize-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Base resize handle styles */
+.resize-handle {
+  position: absolute;
+  pointer-events: all;
+  z-index: 11;
+}
+
+/* Corner handles - 8x8 pixels */
+.resize-nw {
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  cursor: nw-resize;
+}
+
+.resize-ne {
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  cursor: ne-resize;
+}
+
+.resize-sw {
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  cursor: sw-resize;
+}
+
+.resize-se {
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  cursor: se-resize;
+}
+
+/* Edge handles */
+.resize-n {
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  cursor: n-resize;
+}
+
+.resize-s {
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  cursor: s-resize;
+}
+
+.resize-w {
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  cursor: w-resize;
+}
+
+.resize-e {
+  right: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  cursor: e-resize;
+}
+
+/* Optional: Visual feedback on hover (for testing) */
+.resize-handle:hover {
+  background-color: rgba(0, 123, 255, 0.2);
+}
+
+/* Window positioning */
+.window {
+  position: absolute;
+  overflow: hidden;
+  min-width: 300px;
+  min-height: 200px;
+}
