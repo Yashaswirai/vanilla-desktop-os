@@ -24,8 +24,8 @@ const timeCalendar = () => {
   let dte = dt.getDate();
   let month = dt.getMonth();
   let year = dt.getFullYear();
-  calend.innerHTML = `${dte}/${month+1}/${year}`
-  
+  calend.innerHTML = `${dte}/${month + 1}/${year}`;
+
   if (HH < 12) {
     if (HH < 10) {
       HH = "0" + HH;
@@ -48,15 +48,18 @@ const timeCalendar = () => {
 };
 timeCalendar();
 setInterval(() => {
-    timeCalendar();
+  timeCalendar();
 }, 10000);
 
-const menu = document.querySelector(".menu")
-document.querySelector(".window-btn").addEventListener("click",()=>{
+const menu = document.querySelector(".menu");
+document.querySelector(".window-btn").addEventListener("click", () => {
   menu.style.display = menu.style.display === "none" ? "block" : "none";
-})
+});
 document.addEventListener("click", (e) => {
-  if (!menu.contains(e.target) && !document.querySelector(".window-btn").contains(e.target)) {
+  if (
+    !menu.contains(e.target) &&
+    !document.querySelector(".window-btn").contains(e.target)
+  ) {
     menu.style.display = "none"; // Hide the menu if clicked outside
   }
 });
@@ -125,8 +128,9 @@ function createWindow(title, content, img) {
     <div class="window-header w-full flex items-center justify-between p-1">
         <span class="window-title text-lg pl-2">${title}</span>
         <div class="flex items-center justify-end gap-2">
-            <button class="minimize-button hover:bg-gray-100/45 cursor-pointer p-2 w-5">-</button>
-            <button class="close-button text-red-500 hover:bg-gray-100/45 cursor-pointer p-2 w-5">X</button>
+            <button class="minimize-button hover:bg-gray-100/45 cursor-pointer">-</button>
+            <button class="maximize-button hover:bg-gray-100/45 cursor-pointer">🔲</button>
+            <button class="close-button text-red-500 hover:bg-gray-100/45 cursor-pointer">X</button>
         </div>
     </div>
     <div class="window-content p-2 flex-grow overflow-auto">
@@ -143,6 +147,7 @@ function createWindow(title, content, img) {
   addMinimizeButtonFunctionality(windowElement); // Remove isActive parameter
   addTaskbarButtonFunctionality(windowElement, true, img); // Keep the img parameter
   resizeWindows(windowElement); // Add resize functionality
+  maximizeWindow(windowElement); // Add maximize functionality
 }
 
 // Function to handle dragging of windows
@@ -153,12 +158,14 @@ function dragWindow(windowElement) {
 
   const onMouseDown = (e) => {
     // Don't start dragging if clicking on resize handles or buttons
-    if (e.target.classList.contains('resize-handle') || 
-        e.target.classList.contains('minimize-button') || 
-        e.target.classList.contains('close-button')) {
+    if (
+      e.target.classList.contains("resize-handle") ||
+      e.target.classList.contains("minimize-button") ||
+      e.target.classList.contains("close-button")
+    ) {
       return;
     }
-    
+
     if (e.button !== 0) return; // Only drag with left mouse button
 
     isDragging = true;
@@ -175,11 +182,11 @@ function dragWindow(windowElement) {
     if (isDragging) {
       let newLeft = e.clientX - offsetX;
       let newTop = e.clientY - offsetY;
-      
+
       // Keep window within screen bounds
       newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - 100));
       newTop = Math.max(0, Math.min(newTop, window.innerHeight - 50));
-      
+
       windowElement.style.left = `${newLeft}px`;
       windowElement.style.top = `${newTop}px`;
     }
@@ -226,7 +233,7 @@ function addMinimizeButtonFunctionality(windowElement) {
   if (minimizeButton) {
     minimizeButton.addEventListener("click", (e) => {
       e.stopPropagation(); // Prevent event bubbling
-      
+
       // Simply hide the window
       windowElement.style.display = "none";
     });
@@ -237,7 +244,7 @@ function addMinimizeButtonFunctionality(windowElement) {
 function addTaskbarButtonFunctionality(windowElement, isActive, img) {
   // Use the correct selector - look for .btns class
   const taskbar = document.querySelector(".btns");
-  
+
   // Add error checking
   if (!taskbar) {
     console.error("Taskbar container not found");
@@ -250,16 +257,16 @@ function addTaskbarButtonFunctionality(windowElement, isActive, img) {
   button.src = img;
   button.alt = "Taskbar Button";
   button.style.cursor = "pointer";
-  button.style.width = "32px";  // Set a fixed width
+  button.style.width = "32px"; // Set a fixed width
   button.style.height = "32px"; // Set a fixed height
   button.style.marginRight = "4px"; // Add some spacing
-  
+
   taskbar.appendChild(button);
-  
+
   button.addEventListener("click", () => {
     // Check current window state instead of relying on isActive parameter
     const isCurrentlyVisible = windowElement.style.display !== "none";
-    
+
     if (isCurrentlyVisible) {
       windowElement.style.display = "none"; // Hide the window
     } else {
@@ -564,29 +571,29 @@ const resizeWindows = (windowElement) => {
     <div class="resize-handle resize-w" data-direction="w"></div>
     <div class="resize-handle resize-e" data-direction="e"></div>
   `;
-  
+
   // Create a container for resize handles
   const resizeContainer = document.createElement("div");
   resizeContainer.className = "resize-container";
   resizeContainer.innerHTML = resizeHandles;
   windowElement.appendChild(resizeContainer);
-  
+
   // Set minimum dimensions
   const minWidth = 300;
   const minHeight = 200;
-  
+
   let isResizing = false;
   let currentDirection = null;
   let startX, startY, startWidth, startHeight, startLeft, startTop;
-  
+
   // Add event listeners to all resize handles
-  const handles = windowElement.querySelectorAll('.resize-handle');
-  
-  handles.forEach(handle => {
-    handle.addEventListener('mousedown', (e) => {
+  const handles = windowElement.querySelectorAll(".resize-handle");
+
+  handles.forEach((handle) => {
+    handle.addEventListener("mousedown", (e) => {
       isResizing = true;
       currentDirection = handle.dataset.direction;
-      
+
       // Store initial values
       startX = e.clientX;
       startY = e.clientY;
@@ -594,36 +601,36 @@ const resizeWindows = (windowElement) => {
       startHeight = parseInt(getComputedStyle(windowElement).height, 10);
       startLeft = parseInt(getComputedStyle(windowElement).left, 10);
       startTop = parseInt(getComputedStyle(windowElement).top, 10);
-      
+
       // Add global event listeners
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-      
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+
       // Prevent default behavior
       e.preventDefault();
       e.stopPropagation();
     });
   });
-  
+
   const onMouseMove = (e) => {
     if (!isResizing) return;
-    
+
     const deltaX = e.clientX - startX;
     const deltaY = e.clientY - startY;
-    
+
     let newWidth = startWidth;
     let newHeight = startHeight;
     let newLeft = startLeft;
     let newTop = startTop;
-    
+
     // Calculate new dimensions based on resize direction
     switch (currentDirection) {
-      case 'se': // Southeast (bottom-right)
+      case "se": // Southeast (bottom-right)
         newWidth = Math.max(minWidth, startWidth + deltaX);
         newHeight = Math.max(minHeight, startHeight + deltaY);
         break;
-        
-      case 'sw': // Southwest (bottom-left)
+
+      case "sw": // Southwest (bottom-left)
         newWidth = Math.max(minWidth, startWidth - deltaX);
         newHeight = Math.max(minHeight, startHeight + deltaY);
         if (newWidth > minWidth || deltaX < 0) {
@@ -633,8 +640,8 @@ const resizeWindows = (windowElement) => {
           newLeft = startLeft + startWidth - minWidth;
         }
         break;
-        
-      case 'ne': // Northeast (top-right)
+
+      case "ne": // Northeast (top-right)
         newWidth = Math.max(minWidth, startWidth + deltaX);
         newHeight = Math.max(minHeight, startHeight - deltaY);
         if (newHeight > minHeight || deltaY > 0) {
@@ -644,8 +651,8 @@ const resizeWindows = (windowElement) => {
           newTop = startTop + startHeight - minHeight;
         }
         break;
-        
-      case 'nw': // Northwest (top-left)
+
+      case "nw": // Northwest (top-left)
         newWidth = Math.max(minWidth, startWidth - deltaX);
         newHeight = Math.max(minHeight, startHeight - deltaY);
         if (newWidth > minWidth || deltaX < 0) {
@@ -661,8 +668,8 @@ const resizeWindows = (windowElement) => {
           newTop = startTop + startHeight - minHeight;
         }
         break;
-        
-      case 'n': // North (top)
+
+      case "n": // North (top)
         newHeight = Math.max(minHeight, startHeight - deltaY);
         if (newHeight > minHeight || deltaY > 0) {
           newTop = startTop + deltaY;
@@ -671,16 +678,16 @@ const resizeWindows = (windowElement) => {
           newTop = startTop + startHeight - minHeight;
         }
         break;
-        
-      case 's': // South (bottom)
+
+      case "s": // South (bottom)
         newHeight = Math.max(minHeight, startHeight + deltaY);
         break;
-        
-      case 'e': // East (right)
+
+      case "e": // East (right)
         newWidth = Math.max(minWidth, startWidth + deltaX);
         break;
-        
-      case 'w': // West (left)
+
+      case "w": // West (left)
         newWidth = Math.max(minWidth, startWidth - deltaX);
         if (newWidth > minWidth || deltaX < 0) {
           newLeft = startLeft + deltaX;
@@ -690,20 +697,46 @@ const resizeWindows = (windowElement) => {
         }
         break;
     }
-    
+
     // Apply new dimensions and position
     windowElement.style.width = `${newWidth}px`;
     windowElement.style.height = `${newHeight}px`;
     windowElement.style.left = `${newLeft}px`;
     windowElement.style.top = `${newTop}px`;
   };
-  
+
   const onMouseUp = () => {
     isResizing = false;
     currentDirection = null;
-    
+
     // Remove global event listeners
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
   };
 };
+
+// Maximize functionality
+const maximizeWindow = (windowElement) => {
+  let isMaximized = false;
+  const maximizeButton = windowElement.querySelector(".maximize-button");
+  if (maximizeButton) {
+    maximizeButton.addEventListener("click", () => {
+      if (isMaximized) {
+        // Restore to original size
+        windowElement.style.width = "400px"; // Set to original width
+        windowElement.style.height = "300px"; // Set to original height
+        windowElement.style.left = "50%"; // Center horizontally
+        windowElement.style.top = "50%"; // Center vertically
+        windowElement.style.transform = "translate(-50%, -50%)"; // Adjust for centering
+      } else {
+        // Maximize the window
+        windowElement.style.width = "100vw";
+        windowElement.style.height = "100vh";
+        windowElement.style.left = "0";
+        windowElement.style.top = "0";
+        windowElement.style.transform = "none"; // Remove any transform
+      }
+      isMaximized = !isMaximized; // Toggle the state
+    });
+  }
+}

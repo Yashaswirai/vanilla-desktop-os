@@ -84,6 +84,9 @@ html , body{
     -o-user-select: none;
     -webkit-app-region: drag;
 }
+.window-header button{
+    padding: 0 10px;
+}
 .window-header::selection{
     background-color: transparent;
 }
